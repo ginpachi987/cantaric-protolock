@@ -1,7 +1,9 @@
 # Cantaric Protolock
-WoW 9.2 puzzle game Cantaric Protolock remade in JavaScript using P5JS library
+Cantaric Protolock is a puzzle game from World of Warcraft patch 9.2.
 
-The Goal of a game is to "turn off" all squares by inverting either vertical or horizontal lines.
+Remade in JavaScript using P5JS library.
+
+The Goal of the game is to "turn off" all squares by inverting either vertical or horizontal lines.
 
 Live version can be found [here](https://games.yoro.dev/cantaric/).
 

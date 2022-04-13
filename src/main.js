@@ -1,5 +1,5 @@
 import './style.css'
-// import p5 from 'p5/lib/p5'
+import * as p5 from '../node_modules/p5/lib/p5'
 
 const sketch = window
 
@@ -10,7 +10,6 @@ let circleSize = 30
 let field = []
 let fieldSize
 let maxFieldSize = 600
-
 
 sketch.setup = () => {
   createCanvas(windowWidth, windowHeight)
