@@ -7,7 +7,7 @@ The Goal of the game is to "turn off" all squares by inverting either vertical o
 
 Live version can be found [here](https://games.yoro.dev/cantaric/).
 
-![preview!](preview.png)
+![preview!](preview.jpg)
 
 ## Commands
 ### Installation

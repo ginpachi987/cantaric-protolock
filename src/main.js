@@ -1,136 +1,126 @@
 import './style.css'
 import * as p5 from '../node_modules/p5/lib/p5'
 
+import offImage from './img/off.png'
+import onImage from './img/on.png'
+
 const sketch = window
 
-let maxCellSize = 65
 let cellSize
 let fieldDimension = 10
 let circleSize = 30
-let field = []
+let field
 let fieldSize
 let maxFieldSize = 600
 
+let selectedContoller, cX, cY
+
+let off, on
+
+let container
+
+sketch.preload = () => {
+  off = loadImage(offImage)
+  on = loadImage(onImage)  
+}
+
 sketch.setup = () => {
-  createCanvas(windowWidth, windowHeight)
+  container = document.querySelector('main')
+  recalcSizes()
+  createCanvas(fieldSize, fieldSize)
 
-  newField()
+  rectMode(CENTER)
+  imageMode(CENTER)
+  textAlign(CENTER)
 
-  let resetB = document.querySelector('#reset')
-  resetB.addEventListener('click', resetter)
-  resetB.addEventListener('touchstart', resetter)
+  // let resetB = document.querySelector('#reset')
+  // resetB.addEventListener('click', resetter)
+  // resetB.addEventListener('touchstart', resetter)
 
   let newGame = document.querySelector('#new')
   newGame.addEventListener('click', newField)
   newGame.addEventListener('touchstart', newField)
 
-  noLoop()
+  field = new Field(fieldDimension)
+  field.newField()
 }
 
 sketch.draw = () => {
-  fieldSize = Math.min(maxFieldSize, windowWidth, windowHeight) - 20
-  cellSize = fieldSize / (fieldDimension + 1)
-  circleSize = cellSize / 1.8
-
-  clear()
-  background(40)
-  translate((windowWidth - fieldSize) / 2, (windowHeight - fieldSize) / 2)
+  background(41)
   push()
-  translate(cellSize / 2, cellSize / 2)
-  for (let i = 0; i < fieldDimension; i++) {
-    circle(0, i * cellSize, circleSize)
-  }
-  translate(cellSize, cellSize * fieldDimension)
-  for (let i = 0; i < fieldDimension; i++) {
-    circle(i * cellSize, 0, circleSize)
-  }
+  translate(cellSize/2, cellSize/2)
+  field.draw()
   pop()
-  translate(cellSize, 0)
-  for (let i = 0; i < fieldDimension; i++) {
-    for (let j = 0; j < fieldDimension; j++) {
-      fill(field[i][j] ? 250 : 114)
-      stroke(0)
-      strokeWeight(1)
-
-      rect(i * cellSize, j * cellSize, cellSize, cellSize)
-    }
-  }
-  fill(255)
 }
 
 sketch.windowResized = () => {
-  resizeCanvas(windowWidth, windowHeight);
-  redraw()
+  recalcSizes()
+  resizeCanvas(fieldSize, fieldSize);
+  //redraw()
+}
+
+sketch.mouseMoved = () => {
+  let mX = mouseX //- (windowWidth - fieldSize) / 2
+  let mY = mouseY //- (windowHeight - fieldSize) / 2
+
+  if (mX < 0 || mX > fieldSize || mY < 0 || mY > fieldSize) {
+    selectedContoller = null
+    // container.style.cursor = 'default'
+    return
+  }
+
+  cX = Math.floor(mX / cellSize)
+  cY = Math.floor(mY / cellSize)
+
+
+  if (cX > 0 && cY < fieldDimension || (cX == 0 && cY == fieldDimension))
+    selectedContoller = null
+  else {
+    if (cX === 0) {
+      selectedContoller = field.leftSwitches[cY]
+    }
+    else {
+      selectedContoller = field.bottomSwitches[cX - 1]
+    }
+    // container.style.cursor = 'pointer'
+  }
 }
 
 sketch.mouseClicked = () => {
-  let mX = mouseX - (windowWidth - fieldSize) / 2
-  let mY = mouseY - (windowHeight - fieldSize) / 2
+  if (!selectedContoller) return
 
-  if (mX < 0 || mX > fieldSize || mY < 0 || mY > fieldSize) return
-
-  let x = Math.floor(mX / cellSize)
-  let y = Math.floor(mY / cellSize)
-
-  if (x > 0 && y < fieldDimension || (x == 0 && y == fieldDimension)) return
-
-  if (x === 0) {
+  if (cX === 0) {
     for (let i = 0; i < fieldDimension; i++) {
-      field[i][y] = !field[i][y]
+      field.cells[i][cY].state = !field.cells[i][cY].state
     }
   }
-  else if (y === fieldDimension) {
-    x--
+  else {
     for (let i = 0; i < fieldDimension; i++) {
-      field[x][i] = !field[x][i]
+      field.cells[cX - 1][i].state = !field.cells[cX - 1][i].state
     }
   }
 
-  resetMatrix()
-  redraw()
   winCheck()
 }
 
-function newField() {
-  field = [...Array(fieldDimension)].map(() => [...Array(fieldDimension).keys()].map(() => false))
+function recalcSizes() {
+  fieldSize = Math.min(maxFieldSize, windowWidth, windowHeight) - 60
+  cellSize = fieldSize / (fieldDimension + 1)
+  circleSize = cellSize / 1.8
 
-  let rand = Math.random() < .5
-
-  let rands = getRandoms(rand ? 4 : 3)
-
-  for (let i = 0; i < (rand ? 4 : 3); i++) {
-    for (let j = 0; j < fieldDimension; j++) {
-      field[rands[i]][j] = !field[rands[i]][j]
-    }
-  }
-
-  rands = getRandoms(!rand ? 4 : 3)
-
-  for (let i = 0; i < (!rand ? 4 : 3); i++) {
-    for (let j = 0; j < fieldDimension; j++) {
-      field[j][rands[i]] = !field[j][rands[i]]
-    }
-  }
-
-  redraw()
+  container.style.top = (windowHeight - fieldSize) / 2 + 'px'
+  container.style.left = (windowWidth - fieldSize) / 2 + 'px'
 }
 
-function getRandoms(number) {
-  //console.log(number)
-  let arr = []
-  while (arr.length < number) {
-    let el = ~~(Math.random() * fieldDimension)
-    if (arr.indexOf(el) === -1) arr.push(el)
-  }
-  //console.log(arr)
-  return arr
+function newField() {
+  if (field) field.newField()
 }
 
 function winCheck() {
   let notYet = false
   for (let i = 0; i < fieldDimension; i++) {
     for (let j = 0; j < fieldDimension; j++) {
-      if (field[i][j] == true) {
+      if (field.cells[i][j].state == true) {
         notYet = true
         break
       }
@@ -139,13 +129,124 @@ function winCheck() {
   }
 
   if (!notYet) {
-    alert('Yay!')
     setTimeout(() => {
-      newField()
+      alert('Yay!')
+      field.newField()
     }, 1000)
   }
 }
 
-function resetter() {
+// function resetter() {}
 
+class Cell {
+  constructor(state = false) {
+    this.state = state
+    this.opacity = state ? 255 : 0
+  }
+
+  draw(x, y) {
+    if (this.state && this.opacity < 255) {
+      this.opacity += 85
+    }
+    else if (!this.state && this.opacity > 0) {
+      this.opacity -= 85
+    }
+    push()
+    image(off, x * cellSize, y * cellSize, cellSize, cellSize)
+    tint(255, this.opacity)
+    image(on, x * cellSize, y * cellSize, cellSize, cellSize)
+    pop()
+  }
+}
+
+class Switch {
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+  }
+
+  draw(angle) {
+    const runes = ['🜈', '🜘', '🝑', '🝠', '🜋', '🝓']
+
+    push()
+    translate(this.x * cellSize, this.y * cellSize)
+    stroke('#EAD5C2')
+    strokeWeight(1.5)
+    noFill()
+    circle(0, 0, circleSize)
+    circle(0, 0, circleSize / 2)
+
+    rotate(angle)
+    fill(255)
+
+    push()
+    textSize(circleSize / 10)
+    strokeWeight(2)
+    rotate(angle)
+    for (let i = 0; i < 6; i++) {
+      text(runes[i], 0, circleSize / 2.5)
+      rotate(PI / 3)
+    }
+    pop()
+
+    if (this == selectedContoller) {
+      fill('#EAD5C264')
+      tint(255, 128)
+      circle(0, 0, circleSize)
+    }
+    pop()
+  }
+}
+
+class Field {
+  constructor(size) {
+    this.cells = [...Array(size)].map(() => [...Array(size).keys()].map(() => new Cell()))
+    this.controlAngle = 0
+    this.leftSwitches = [...Array(size).keys()].map((_, i) => new Switch(0, i))
+    this.bottomSwitches = [...Array(size).keys()].map((_, i) => new Switch((i + 1), size))
+
+    this.display = false
+    this.transparency = 0
+  }
+
+  newField() {
+    let rand = Math.random() < .5
+    let rands = this.getRandomNumbers(rand ? 4 : 3)
+    for (let i = 0; i < (rand ? 4 : 3); i++) {
+      for (let j = 0; j < fieldDimension; j++) {
+        this.cells[rands[i]][j].state = !this.cells[rands[i]][j].state
+      }
+    }
+    rands = this.getRandomNumbers(!rand ? 4 : 3)
+    for (let i = 0; i < (!rand ? 4 : 3); i++) {
+      for (let j = 0; j < fieldDimension; j++) {
+        this.cells[j][rands[i]].state = !this.cells[j][rands[i]].state
+      }
+    }
+  }
+
+  getRandomNumbers(amount) {
+    let arr = []
+    while (arr.length < amount) {
+      let el = floor(Math.random() * fieldDimension)
+      if (arr.indexOf(el) === -1) arr.push(el)
+    }
+    return arr
+  }
+
+  draw() {
+    this.cells.forEach((row, i) => {
+      row.forEach((cell, j) => {
+        cell.draw((i + 1), j)
+      })
+    })
+    this.bottomSwitches.forEach((control, i) => {
+      control.draw(this.controlAngle)
+    })
+    this.leftSwitches.forEach((control, i) => {
+      control.draw(this.controlAngle)
+    })
+    this.controlAngle -= .01
+    if (this.controlAngle < -PI * 2) this.controlAngle = 0
+  }
 }
