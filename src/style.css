@@ -48,7 +48,7 @@ body {
 
 .button {
   display: inline-block;
-  width: 100px;
+  width: 120px;
   border-style: solid;
   border-width: 16px;
   border-image: url('./img/border1.png') 16 repeat repeat;

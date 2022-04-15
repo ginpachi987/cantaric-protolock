@@ -1,3 +1,5 @@
+/// <reference types="../node_modules/@types/p5/global" />
+
 import './style.css'
 import * as p5 from '../node_modules/p5/lib/p5'
 
@@ -21,7 +23,7 @@ let container
 
 sketch.preload = () => {
   off = loadImage(offImage)
-  on = loadImage(onImage)  
+  on = loadImage(onImage)
 }
 
 sketch.setup = () => {
@@ -48,7 +50,7 @@ sketch.setup = () => {
 sketch.draw = () => {
   background(41)
   push()
-  translate(cellSize/2, cellSize/2)
+  translate(cellSize / 2, cellSize / 2)
   field.draw()
   pop()
 }
@@ -91,12 +93,16 @@ sketch.mouseClicked = () => {
 
   if (cX === 0) {
     for (let i = 0; i < fieldDimension; i++) {
-      field.cells[i][cY].state = !field.cells[i][cY].state
+      setTimeout((x, y) => {
+        field.cells[x][y].state = !field.cells[x][y].state
+      }, i * 50, i, cY)
     }
   }
   else {
     for (let i = 0; i < fieldDimension; i++) {
-      field.cells[cX - 1][i].state = !field.cells[cX - 1][i].state
+      setTimeout((x, y) => {
+        field.cells[x][y].state = !field.cells[x][y].state
+      }, (fieldDimension - 1 - i) * 50, cX - 1, i)
     }
   }
 
