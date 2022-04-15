@@ -21,12 +21,73 @@ body {
   border-style: solid;
   border-width: 12px;
   border-image: url('./img/border4.svg') 12 repeat repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#game {
+  flex: 1;
+  /* border: 1px solid white; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.cell {
+  width: 64px;
+  height: 64px;
+  /* background-image: url('./img/off.png'); */
+  transition: background-image 0.2s ease-in;
+  background-size: 64px;
+}
+
+.switch {
+  /* background-image: url('./img/switch.png'); */
+  width: 64px;
+  height: 64px;
+  background-size: 32px;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.switch-image:hover {
+  box-shadow: 0 0 10px #fff;
+  background-color: #69696980;
+}
+
+.switch-image {
+  cursor: pointer;
+  animation:spin 16s linear infinite;
+  width: 50%;
+  margin: 8px;
+  padding: 2px;
+  display: block;
+  border-radius: 50%;
+}
+
+@keyframes spin { 
+  100% {  
+      transform:rotate(-360deg); 
+  } 
 }
 
 .buttons {
-  position: fixed;
-  bottom: 40px;
-  left: 0;
+  /* /position: fixed; */
+  margin: 20px;
   width: 100%;
   text-align: center;
 }
@@ -82,6 +143,7 @@ nav {
   max-width: 600px;
   color: white;
   height: 52px;
+  margin: 27px;
 }
 
 .links {

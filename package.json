@@ -1,7 +1,7 @@
 {
   "name": "cantaric-protolock",
   "private": true,
-  "version": "1.0",
+  "version": "1.0-NC",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
