@@ -56,7 +56,7 @@ body {
   background-size: 32px;
   background-position: 50%;
   background-repeat: no-repeat;
-  
+
 
   display: flex;
   flex-direction: column;
@@ -71,7 +71,7 @@ body {
 
 .switch-image {
   cursor: pointer;
-  animation:spin 16s linear infinite;
+  animation: spin 16s linear infinite;
   width: 50%;
   margin: 8px;
   padding: 2px;
@@ -79,10 +79,10 @@ body {
   border-radius: 50%;
 }
 
-@keyframes spin { 
-  100% {  
-      transform:rotate(-360deg); 
-  } 
+@keyframes spin {
+  100% {
+    transform: rotate(-360deg);
+  }
 }
 
 .buttons {
@@ -109,7 +109,8 @@ body {
 
 .button {
   display: inline-block;
-  width: 120px;
+  position: relative;
+  /* width: 120px; */
   border-style: solid;
   border-width: 16px;
   border-image: url('./img/border1.png') 16 repeat repeat;
@@ -125,6 +126,7 @@ body {
   width: 100%;
   text-align: center;
   background-color: #500201;
+  padding: 0 4px;
 
   color: #ffd600;
   font-family: 'Jura', sans-serif;
@@ -143,7 +145,7 @@ nav {
   max-width: 600px;
   color: white;
   height: 52px;
-  margin: 27px;
+  /* margin: 27px; */
 }
 
 .links {
@@ -182,4 +184,35 @@ main {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+}
+
+#tip {
+  position: absolute;
+  text-align: center;
+  top: -80px;
+  right: -16px;
+  pointer-events: none;
+  padding: 8px;
+  width: 90px;
+  /* background: url('/img/tooltip.png') round round; */
+ 
+  border-style: solid;
+  border-width: 6px;
+  border-image: url('img/tooltip.png') 6 round round;
+  background-color: #010721CC;
+
+  opacity: 0;
+  transition: all 0.5s ease-in;
+  cursor: pointer;
+}
+
+#tip::after {
+  display:block;
+  position: absolute;
+  bottom: -24px;
+  right: 5px;
+  width: 42px;
+  height: 21px;
+  content: '';
+  background-image: url('./img/tip.png');
 }
