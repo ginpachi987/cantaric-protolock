@@ -11,7 +11,7 @@ class Cell {
   }
 
   toggleState(state) {
-    this.state = state == undefined?!this.state:state
+    this.state = state == undefined ? !this.state : state
     this.el.style.backgroundImage = `url('${this.state ? onImage : offImage}')`
   }
 }
@@ -27,10 +27,14 @@ class Switch {
       this.image.src = switchImage
 
       this.image.addEventListener('click', () => {
-        field.toggleCells(x, y)
+        field.mouseClick(x, y)
       })
       this.el.appendChild(this.image)
     }
+  }
+
+  highlight() {
+    this.image.classList.toggle('switch-highlight')
   }
 
   draw(angle) {
@@ -68,6 +72,7 @@ class Switch {
 
 export class Field {
   constructor(size, container) {
+    this.container = container
     this.size = size
     this.cells = [...Array(size)].map(() => [...Array(size).keys()].map(() => new Cell()))
     this.leftSwitches = [...Array(size).keys()].map((_, i) => new Switch(this, i, null))
@@ -107,11 +112,14 @@ export class Field {
         }, i * delay, row, i)
       }
     }
+  }
+
+  mouseClick(row, col) {
+    this.toggleCells(row, col)
 
     setTimeout(() => {
       this.winCheck()
-    }, this.size * delay)
-
+    }, this.size * 50)
   }
 
   reset() {
@@ -127,20 +135,12 @@ export class Field {
 
     let rand = Math.random() < .5
     let rands = this.getRandomNumbers(rand ? 4 : 3)
-    console.log(rands)
     for (let i = 0; i < (rand ? 4 : 3); i++) {
       this.toggleCells(rands[i], null, 0)
-      // for (let j = 0; j < this.size; j++) {
-      //   this.cells[rands[i]][j].toggleState()
-      // }
     }
     rands = this.getRandomNumbers(!rand ? 4 : 3)
-    console.log(rands)
     for (let i = 0; i < (!rand ? 4 : 3); i++) {
       this.toggleCells(null, rands[i], 0)
-      // for (let j = 0; j < this.size; j++) {
-      //   this.cells[j][rands[i]].toggleState()
-      // }
     }
   }
 
@@ -170,18 +170,18 @@ export class Field {
   }
 
   setSize(size) {
-    this.cells.forEach((row, i) => {
-      row.forEach((cell, j) => {
+    this.cells.forEach(row => {
+      row.forEach(cell => {
         cell.el.style.width = `${size}px`
         cell.el.style.height = `${size}px`
         cell.el.style.backgroundSize = `${size}px`
       })
     })
-    this.bottomSwitches.forEach((control, i) => {
+    this.bottomSwitches.forEach(control => {
       control.el.style.width = `${size}px`
       control.el.style.height = `${size}px`
     })
-    this.leftSwitches.forEach((control, i) => {
+    this.leftSwitches.forEach(control => {
       control.el.style.width = `${size}px`
       control.el.style.height = `${size}px`
     })
@@ -198,14 +198,34 @@ export class Field {
       }
       if (notYet) break
     }
-  
-    if (!notYet) {
-      setTimeout(() => {
-        alert('Yay!')
-        this.newField()
 
-        window.top.postMessage({type: 'message', data: 'win'}, '*')
-      }, 1000)
+    if (!notYet) {
+      this.container.style.pointerEvents = 'none'
+      this.flicker()
+
+      setTimeout(() => {
+        // console.log('Yay!')
+        this.newField()
+        this.container.style.pointerEvents = 'auto'
+
+        window.top.postMessage("registerWin", '*')
+      }, this.size * 250)
+    }
+  }
+
+  flicker() {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j <= i; j++) {
+        setTimeout((x, y) => {
+          this.cells[x][y].toggleState()
+          if (x != y) this.cells[y][x].toggleState()
+        }, (i + 1) * 100, i, j)
+
+        setTimeout((x, y) => {
+          this.cells[x][y].toggleState()
+          if (x != y) this.cells[y][x].toggleState()
+        }, (i + 1) * 100 + this.size * 100, i, j)
+      }
     }
   }
 }

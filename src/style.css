@@ -27,7 +27,7 @@ body {
   align-items: center;
 }
 
-#game {
+#game, .game {
   flex: 1;
   /* border: 1px solid white; */
   display: flex;
@@ -64,7 +64,7 @@ body {
   align-items: center;
 }
 
-.switch-image:hover {
+.switch-image:hover, .switch-highlight {
   box-shadow: 0 0 10px #fff;
   background-color: #69696980;
 }
@@ -215,4 +215,56 @@ main {
   height: 21px;
   content: '';
   background-image: url('./img/tip.png');
+}
+
+#tutorial-wrapper {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #292929DD;
+  overflow-y: auto;
+  max-height: 100%;
+  
+}
+
+.tutorial {
+  width: 600px;
+  max-width: 100%;
+  position: relative;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.tut-display {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+#tutorial-close {
+  position: absolute;
+  top: 32px;
+  right: 16px;
+  width: 1.1em;
+  height: 1.1em;
+  color: white;
+  text-align: center;
+  font-size: 1em;
+  border: 1px solid white;
+  border-radius: 0.5em;
+  padding: 4px;
+  cursor: pointer;
+}
+
+#tutorial-close:hover {
+  background-color: #e43838a2;
 }
