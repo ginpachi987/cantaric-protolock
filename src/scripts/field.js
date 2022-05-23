@@ -120,8 +120,6 @@ export class Field {
       setTimeout(() => {
         this.newField()
         this.container.style.pointerEvents = 'auto'
-
-        window.top.postMessage("registerWin", '*')
       }, this.size * 250)
     }
   }
