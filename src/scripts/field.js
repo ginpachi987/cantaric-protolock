@@ -1,77 +1,8 @@
-import offImage from './img/off.png'
-import onImage from './img/on.png'
-import switchImage from './img/switch.png'
-
-class Cell {
-  constructor(state = false) {
-    this.state = state
-    this.el = document.createElement('div')
-    this.el.classList.add('cell')
-    this.el.style.backgroundImage = `url('${offImage}')`
-  }
-
-  toggleState(state) {
-    this.state = state == undefined ? !this.state : state
-    this.el.style.backgroundImage = `url('${this.state ? onImage : offImage}')`
-  }
-}
-
-class Switch {
-  constructor(field, x, y) {
-    this.field = field
-    this.el = document.createElement('div')
-    this.el.classList.add('switch')
-    if (x != null || y != null) {
-      this.image = document.createElement('img')
-      this.image.classList.add('switch-image')
-      this.image.src = switchImage
-
-      this.image.addEventListener('click', () => {
-        field.mouseClick(x, y)
-      })
-      this.el.appendChild(this.image)
-    }
-  }
-
-  highlight() {
-    this.image.classList.toggle('switch-highlight')
-  }
-
-  draw(angle) {
-    const runes = ['🜈', '🜘', '🝑', '🝠', '🜋', '🝓']
-
-    push()
-    translate(this.x * cellSize, this.y * cellSize)
-    stroke('#EAD5C2')
-    strokeWeight(1.5)
-    noFill()
-    circle(0, 0, circleSize)
-    circle(0, 0, circleSize / 2)
-
-    rotate(angle)
-    fill(255)
-
-    push()
-    textSize(circleSize / 10)
-    strokeWeight(2)
-    rotate(angle)
-    for (let i = 0; i < 6; i++) {
-      text(runes[i], 0, circleSize / 2.5)
-      rotate(PI / 3)
-    }
-    pop()
-
-    if (this == selectedContoller) {
-      fill('#EAD5C264')
-      tint(255, 128)
-      circle(0, 0, circleSize)
-    }
-    pop()
-  }
-}
+import { Cell } from './cell'
+import { Switch } from './switch'
 
 export class Field {
-  constructor(size, container) {
+  constructor(container, size = 10) {
     this.container = container
     this.size = size
     this.cells = [...Array(size)].map(() => [...Array(size).keys()].map(() => new Cell()))
@@ -79,7 +10,7 @@ export class Field {
     this.bottomSwitches = [new Switch(this, null, null)].concat([...Array(size).keys()].map((_, i) => new Switch(this, null, i)))
 
     for (let i = 0; i <= size; i++) {
-      let row = document.createElement('div')
+      const row = document.createElement('div')
       row.classList.add('row')
       if (i < size) {
         row.appendChild(this.leftSwitches[i].el)
@@ -92,7 +23,6 @@ export class Field {
           row.appendChild(this.bottomSwitches[j].el)
         }
       }
-
       container.appendChild(row)
     }
   }
@@ -133,7 +63,7 @@ export class Field {
   newField() {
     this.reset()
 
-    let rand = Math.random() < .5
+    const rand = Math.random() < .5
     let rands = this.getRandomNumbers(rand ? 4 : 3)
     for (let i = 0; i < (rand ? 4 : 3); i++) {
       this.toggleCells(rands[i], null, 0)
@@ -145,28 +75,12 @@ export class Field {
   }
 
   getRandomNumbers(amount) {
-    let arr = []
+    const arr = []
     while (arr.length < amount) {
-      let el = Math.floor(Math.random() * this.size)
+      const el = Math.floor(Math.random() * this.size)
       if (arr.indexOf(el) === -1) arr.push(el)
     }
     return arr
-  }
-
-  draw() {
-    this.cells.forEach((row, i) => {
-      row.forEach((cell, j) => {
-        cell.draw((i + 1), j)
-      })
-    })
-    this.bottomSwitches.forEach((control, i) => {
-      control.draw(this.controlAngle)
-    })
-    this.leftSwitches.forEach((control, i) => {
-      control.draw(this.controlAngle)
-    })
-    this.controlAngle -= .01
-    if (this.controlAngle < -PI * 2) this.controlAngle = 0
   }
 
   setSize(size) {
@@ -188,23 +102,22 @@ export class Field {
   }
 
   winCheck() {
-    let notYet = false
+    let win = true
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
         if (this.cells[i][j].state == true) {
-          notYet = true
+          win = false
           break
         }
       }
-      if (notYet) break
+      if (!win) break
     }
 
-    if (!notYet) {
+    if (win) {
       this.container.style.pointerEvents = 'none'
       this.flicker()
 
       setTimeout(() => {
-        // console.log('Yay!')
         this.newField()
         this.container.style.pointerEvents = 'auto'
 
